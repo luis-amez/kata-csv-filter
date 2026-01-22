@@ -1,0 +1,54 @@
+{
+  "name": "ts-eslint-prettier-jest-minimal",
+  "version": "1.0.0",
+  "description": "TypeScript template with ESLint, Prettier and Jest",
+  "main": "lib/index.js",
+  "scripts": {
+    "prepare": "husky install",
+    "dev": "tsc --watch",
+    "build": "npm run clean && tsc -b",
+    "clean": "rm -rf lib coverage",
+    "analyze": "npm run lint:fix && npm run compile",
+    "compile": "tsc --noEmit",
+    "compile:watch": "tsc --noEmit --watch",
+    "compile:build": "tsc -b",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint-staged": "lint-staged",
+    "lint-staged:debug": "lint-staged --debug",
+    "format": "prettier --config .prettierrc '**/*.+(ts|tsx)'",
+    "format:check": "prettier --config .prettierrc '**/*.+(ts|tsx)' --check",
+    "format:fix": "prettier --config .prettierrc '**/*.+(ts|tsx)' --write",
+    "test": "jest --verbose",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --maxWorkers=2",
+    "validate": "npm run compile && npm run lint && npm run test",
+    "upgrade": "ncu -i",
+    "upgrade:all": "ncu -u"
+  },
+  "author": "Softwarecrafters.io",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "30.0.0",
+    "@types/node": "24.10.1",
+    "@typescript-eslint/eslint-plugin": "8.48.1",
+    "@typescript-eslint/parser": "8.48.1",
+    "eslint": "9.39.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.4",
+    "husky": "9.1.7",
+    "jest": "30.2.0",
+    "lint-staged": "16.2.7",
+    "npm-check-updates": "19.1.2",
+    "prettier": "3.7.4",
+    "ts-jest": "29.4.6",
+    "typescript": "5.9.3"
+  },
+  "lint-staged": {
+    "*.+(ts|tsx)": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
