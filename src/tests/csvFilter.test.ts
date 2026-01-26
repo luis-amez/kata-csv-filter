@@ -25,25 +25,36 @@ describe('csvFilter', () => {
   });
 
   it('filters out all the invoices with repeated invoice number', () => {
-    const distinctNumberInvoices = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const distinctNumberInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
     const repeatedNumberInvoices = createInvoiceLine({ numFactura: 2 }) + createInvoiceLine({ numFactura: 2 });
-    const allInvoices = distinctNumberInvoices + repeatedNumberInvoices;
+    const allInvoices = distinctNumberInvoice + repeatedNumberInvoices;
     const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
 
     const result = csvInvoiceFilter.filterInvoices();
 
-    expect(result).toBe(distinctNumberInvoices);
+    expect(result).toBe(distinctNumberInvoice);
   });
 
   it('filters out all the invoices with both IVA and IGIC', () => {
-    const distinctTaxesInvoices = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
-    const bothKindOfTaxesInvoices = createInvoiceLine({ numFactura: 2, iva: '20', igic: '10' });
-    const allInvoices = distinctTaxesInvoices + bothKindOfTaxesInvoices;
+    const oneTaxCodeInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const bothKindOfTaxesInvoice = createInvoiceLine({ numFactura: 2, iva: '20', igic: '10' });
+    const allInvoices = oneTaxCodeInvoice + bothKindOfTaxesInvoice;
     const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
 
     const result = csvInvoiceFilter.filterInvoices();
 
-    expect(result).toBe(distinctTaxesInvoices);
+    expect(result).toBe(oneTaxCodeInvoice);
+  });
+
+  it('filters out all the invoices without tax code', () => {
+    const oneTaxCodeInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const noTaxCodeInvoice = createInvoiceLine({ numFactura: 2, iva: '', igic: '' });
+    const allInvoices = oneTaxCodeInvoice + noTaxCodeInvoice;
+    const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
+
+    const result = csvInvoiceFilter.filterInvoices();
+
+    expect(result).toBe(oneTaxCodeInvoice);
   });
 });
 

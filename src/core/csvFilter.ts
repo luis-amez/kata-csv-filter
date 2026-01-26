@@ -40,7 +40,7 @@ export class CsvInvoiceFilter {
     if (header !== CsvInvoiceFilter.getInvoiceHeader()) throw new TypeError('Invalid Header');
 
     return [header]
-      .concat(this.filterRepeatedInvoiceNumber().filterInvoicesWithBothTaxes().getFilteredInvoices())
+      .concat(this.filterRepeatedInvoiceNumber().filterInvoicesWithoutJustOneTaxCode().getFilteredInvoices())
       .join('\n');
   }
 
@@ -77,13 +77,15 @@ export class CsvInvoiceFilter {
     return invoiceNumbersFrequency;
   }
 
-  private filterInvoicesWithBothTaxes() {
+  private filterInvoicesWithoutJustOneTaxCode() {
     this.invoices = this.invoices.filter((invoice) => {
       const iva =
         invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.iva)];
       const igic =
         invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.igic)];
-      return iva === '' || igic === '';
+      const hasBothTaxCodes = iva !== '' && igic !== '';
+      const hasNoTaxCode = iva === '' && igic === '';
+      return !hasBothTaxCodes && !hasNoTaxCode;
     });
 
     return this;
