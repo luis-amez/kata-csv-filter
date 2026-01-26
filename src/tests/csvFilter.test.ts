@@ -7,6 +7,34 @@ describe('csvFilter', () => {
     }).toThrow('Invalid Header');
   });
 
+  it('fails if there is an invoice with not valid gross', () => {
+    expect(() => {
+      const wrongGrossInvoice = createInvoiceLine({ bruto: 'hello' });
+      new CsvInvoiceFilter(createInvoiceHeader() + wrongGrossInvoice).filterInvoices();
+    }).toThrow('Invalid Amount');
+  });
+
+  it('fails if there is an invoice with not valid net', () => {
+    expect(() => {
+      const wrongNetInvoice = createInvoiceLine({ neto: 'hello' });
+      new CsvInvoiceFilter(createInvoiceHeader() + wrongNetInvoice).filterInvoices();
+    }).toThrow('Invalid Amount');
+  });
+
+  it('fails if there is an invoice with not valid IVA', () => {
+    expect(() => {
+      const wrongIVAInvoice = createInvoiceLine({ iva: 'hello' });
+      new CsvInvoiceFilter(createInvoiceHeader() + wrongIVAInvoice).filterInvoices();
+    }).toThrow('Invalid Tax Code');
+  });
+
+  it('fails if there is an invoice with invalid IGIC', () => {
+    expect(() => {
+      const wrongIGICInvoice = createInvoiceLine({ igic: '-5' });
+      new CsvInvoiceFilter(createInvoiceHeader() + wrongIGICInvoice).filterInvoices();
+    }).toThrow('Invalid Tax Code');
+  });
+
   it('filters nothing if the file only has the right header', () => {
     const csvInvoiceFilter = new CsvInvoiceFilter(createInvoiceHeader());
 

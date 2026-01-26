@@ -22,6 +22,7 @@ export class CsvInvoiceFilter {
     this.invoiceHeaderFields.nifCliente,
   ];
   private csvFile: string;
+  private header: string = '';
   private invoices: string[] = [];
 
   constructor(csvFile: string) {
@@ -32,13 +33,13 @@ export class CsvInvoiceFilter {
     const linesSeparator = '\n';
     const lines = this.csvFile.split(linesSeparator);
     const headerLine = 0;
-    const header = lines[headerLine];
+    this.header = lines[headerLine];
     const startLineForInvoices = 1;
     this.invoices = lines.slice(startLineForInvoices);
 
-    if (header !== this.invoiceHeaderAsArray.join(',')) throw new TypeError('Invalid Header');
+    this.checkDataIsValid();
 
-    return [header]
+    return [this.header]
       .concat(
         this.filterRepeatedInvoiceNumber()
           .filterInvoicesWithoutJustOneTaxCode()
@@ -48,6 +49,33 @@ export class CsvInvoiceFilter {
           .getFilteredInvoices()
       )
       .join('\n');
+  }
+
+  private checkDataIsValid() {
+    this.checkHeaderIsValid();
+    this.invoices.forEach((invoice) => {
+      const invoiceAsArray = invoice.split(',');
+      const bruto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.bruto)];
+      this.checkAmountIsValid(bruto);
+      const neto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.neto)];
+      this.checkAmountIsValid(neto);
+      const iva = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.iva)];
+      this.checkTaxCodeIsValid(iva);
+      const igic = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.igic)];
+      this.checkTaxCodeIsValid(igic);
+    });
+  }
+
+  private checkHeaderIsValid() {
+    if (this.header !== this.invoiceHeaderAsArray.join(',')) throw new TypeError('Invalid Header');
+  }
+
+  private checkAmountIsValid(gross: string) {
+    if (!/^[0-9]*$/.test(gross)) throw new TypeError('Invalid Amount');
+  }
+
+  private checkTaxCodeIsValid(taxCode: string) {
+    if (!/^[0-9]*$/.test(taxCode)) throw new TypeError('Invalid Tax Code');
   }
 
   private getIndexOfField(field: string) {
