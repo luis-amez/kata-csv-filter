@@ -39,7 +39,9 @@ export class CsvInvoiceFilter {
 
     if (header !== CsvInvoiceFilter.getInvoiceHeader()) throw new TypeError('Invalid Header');
 
-    return [header].concat(this.filterRepeatedInvoiceNumber().getFilteredInvoices()).join('\n');
+    return [header]
+      .concat(this.filterRepeatedInvoiceNumber().filterInvoicesWithBothTaxes().getFilteredInvoices())
+      .join('\n');
   }
 
   private filterRepeatedInvoiceNumber() {
@@ -73,6 +75,18 @@ export class CsvInvoiceFilter {
     }
 
     return invoiceNumbersFrequency;
+  }
+
+  private filterInvoicesWithBothTaxes() {
+    this.invoices = this.invoices.filter((invoice) => {
+      const iva =
+        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.iva)];
+      const igic =
+        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.igic)];
+      return iva === '' || igic === '';
+    });
+
+    return this;
   }
 
   private getFilteredInvoices() {

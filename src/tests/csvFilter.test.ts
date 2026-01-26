@@ -39,4 +39,16 @@ describe('csvFilter', () => {
 
     expect(result).toBe(distinctNumberInvoices);
   });
+
+  it('filters out all the invoices with both IVA and IGIC', () => {
+    const distinctTaxesInvoices =
+      CsvInvoiceFilter.getInvoiceHeader() + '\n1,02/05/2019,960,800,20,,ACERLaptop,B76430134,';
+    const bothKindOfTaxesInvoices = '\n2,03/08/2019,2400,2000,20,8,MacBook Pro,,78544372A';
+    const allInvoices = distinctTaxesInvoices + bothKindOfTaxesInvoices;
+    const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
+
+    const result = csvInvoiceFilter.filterInvoices();
+
+    expect(result).toBe(distinctTaxesInvoices);
+  });
 });
