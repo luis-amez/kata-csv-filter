@@ -96,6 +96,16 @@ describe('csvFilter', () => {
 
     expect(result).toBe(oneIdentifierInvoice);
   });
+
+  it('filters out all the invoices with IVA wrongly calculated', () => {
+    const rightIvaInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const wrongIvaInvoice = createInvoiceLine({ numFactura: 2, bruto: '1100', neto: '1000', iva: '20' });
+    const allInvoices = rightIvaInvoice + wrongIvaInvoice;
+
+    const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
+
+    expect(csvInvoiceFilter.filterInvoices()).toBe(rightIvaInvoice);
+  });
 });
 
 function createInvoiceLine({
