@@ -16,7 +16,20 @@ describe('csvFilter', () => {
   });
 
   it('filters nothing if the file has the right information', () => {
-    const invoices = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({}) + createInvoiceLine({ numFactura: 2 });
+    const invoices =
+      CsvInvoiceFilter.getInvoiceHeader() +
+      createInvoiceLine({}) +
+      createInvoiceLine({
+        numFactura: 2,
+        fecha: '03/08/2019',
+        bruto: '2160',
+        neto: '2000',
+        iva: '',
+        igic: '8',
+        concepto: 'MacBook Pro',
+        cifCliente: '',
+        nifCliente: '78544372A',
+      });
     const csvInvoiceFilter = new CsvInvoiceFilter(invoices);
 
     const result = csvInvoiceFilter.filterInvoices();
