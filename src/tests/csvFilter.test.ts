@@ -56,6 +56,33 @@ describe('csvFilter', () => {
 
     expect(result).toBe(oneTaxCodeInvoice);
   });
+
+  it('filters out all the invoices with both CIF and NIF', () => {
+    const oneIdentifierInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const bothIdentifiersInvoice = createInvoiceLine({
+      numFactura: 2,
+      cifCliente: 'B76430134',
+      nifCliente: '78544372A',
+    });
+    const allInvoices = oneIdentifierInvoice + bothIdentifiersInvoice;
+    const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
+
+    const result = csvInvoiceFilter.filterInvoices();
+
+    expect(result).toBe(oneIdentifierInvoice);
+  });
+
+  it('filters out all the invoices without identifier', () => {
+    const oneIdentifierInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const noIdentifierInvoice = createInvoiceLine({ numFactura: 2, cifCliente: '', nifCliente: '' });
+    const allInvoices = oneIdentifierInvoice + noIdentifierInvoice;
+
+    const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
+
+    const result = csvInvoiceFilter.filterInvoices();
+
+    expect(result).toBe(oneIdentifierInvoice);
+  });
 });
 
 function createInvoiceLine({

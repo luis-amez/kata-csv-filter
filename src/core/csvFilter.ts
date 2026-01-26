@@ -40,7 +40,12 @@ export class CsvInvoiceFilter {
     if (header !== CsvInvoiceFilter.getInvoiceHeader()) throw new TypeError('Invalid Header');
 
     return [header]
-      .concat(this.filterRepeatedInvoiceNumber().filterInvoicesWithoutJustOneTaxCode().getFilteredInvoices())
+      .concat(
+        this.filterRepeatedInvoiceNumber()
+          .filterInvoicesWithoutJustOneTaxCode()
+          .filterInvoicesWithoutJustOneIdentifier()
+          .getFilteredInvoices()
+      )
       .join('\n');
   }
 
@@ -86,6 +91,24 @@ export class CsvInvoiceFilter {
       const hasBothTaxCodes = iva !== '' && igic !== '';
       const hasNoTaxCode = iva === '' && igic === '';
       return !hasBothTaxCodes && !hasNoTaxCode;
+    });
+
+    return this;
+  }
+
+  private filterInvoicesWithoutJustOneIdentifier() {
+    this.invoices = this.invoices.filter((invoice) => {
+      const cifCliente =
+        invoice.split(',')[
+          CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.cifCliente)
+        ];
+      const nifCliente =
+        invoice.split(',')[
+          CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.nifCliente)
+        ];
+      const hasBothIdentifiers = cifCliente !== '' && nifCliente !== '';
+      const hasNoIdentifier = cifCliente === '' && nifCliente === '';
+      return !hasBothIdentifiers && !hasNoIdentifier;
     });
 
     return this;
