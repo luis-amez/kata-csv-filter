@@ -89,7 +89,6 @@ describe('csvFilter', () => {
     const oneIdentifierInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
     const noIdentifierInvoice = createInvoiceLine({ numFactura: 2, cifCliente: '', nifCliente: '' });
     const allInvoices = oneIdentifierInvoice + noIdentifierInvoice;
-
     const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
 
     const result = csvInvoiceFilter.filterInvoices();
@@ -101,10 +100,22 @@ describe('csvFilter', () => {
     const rightIvaInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
     const wrongIvaInvoice = createInvoiceLine({ numFactura: 2, bruto: '1100', neto: '1000', iva: '20' });
     const allInvoices = rightIvaInvoice + wrongIvaInvoice;
-
     const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
 
-    expect(csvInvoiceFilter.filterInvoices()).toBe(rightIvaInvoice);
+    const result = csvInvoiceFilter.filterInvoices();
+
+    expect(result).toBe(rightIvaInvoice);
+  });
+
+  it('filters out all the invoices with IGIC wrongly calculated', () => {
+    const rightIgicInvoice = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const wrongIgicInvoice = createInvoiceLine({ numFactura: 2, bruto: '1100', neto: '1000', iva: '', igic: '8' });
+    const allInvoices = rightIgicInvoice + wrongIgicInvoice;
+    const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
+
+    const result = csvInvoiceFilter.filterInvoices();
+
+    expect(result).toBe(rightIgicInvoice);
   });
 });
 

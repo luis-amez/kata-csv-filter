@@ -45,6 +45,7 @@ export class CsvInvoiceFilter {
           .filterInvoicesWithoutJustOneTaxCode()
           .filterInvoicesWithoutJustOneIdentifier()
           .filterInvoicesWithIvaWronglyCalculated()
+          .filterInvoicesWithIgicWronglyCalculated()
           .getFilteredInvoices()
       )
       .join('\n');
@@ -125,6 +126,21 @@ export class CsvInvoiceFilter {
         invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.iva)];
       if (iva === '') return true;
       return Number(bruto) === (Number(neto) * Number(iva)) / 100 + Number(neto);
+    });
+
+    return this;
+  }
+
+  filterInvoicesWithIgicWronglyCalculated() {
+    this.invoices = this.invoices.filter((invoice) => {
+      const bruto =
+        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.bruto)];
+      const neto =
+        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.neto)];
+      const igic =
+        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.igic)];
+      if (igic === '') return true;
+      return Number(bruto) === (Number(neto) * Number(igic)) / 100 + Number(neto);
     });
 
     return this;
