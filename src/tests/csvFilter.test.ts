@@ -16,10 +16,7 @@ describe('csvFilter', () => {
   });
 
   it('filters nothing if the file has the right information', () => {
-    const invoices =
-      CsvInvoiceFilter.getInvoiceHeader() +
-      '\n1,02/05/2019,960,800,20,,ACERLaptop,B76430134,' +
-      '\n2,03/08/2019,2160,2000,,8,MacBook Pro,,78544372A';
+    const invoices = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({}) + createInvoiceLine({ numFactura: 2 });
     const csvInvoiceFilter = new CsvInvoiceFilter(invoices);
 
     const result = csvInvoiceFilter.filterInvoices();
@@ -28,10 +25,8 @@ describe('csvFilter', () => {
   });
 
   it('filters out all the invoices with repeated invoice number', () => {
-    const distinctNumberInvoices =
-      CsvInvoiceFilter.getInvoiceHeader() + '\n1,02/05/2019,960,800,20,,ACERLaptop,B76430134,';
-    const repeatedNumberInvoices =
-      '\n2,03/08/2019,2160,2000,,8,MacBook Pro,,78544372A' + '\n2,10/11/2019,2200,2000,,10,MacBook Pro,,78544372A';
+    const distinctNumberInvoices = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const repeatedNumberInvoices = createInvoiceLine({ numFactura: 2 }) + createInvoiceLine({ numFactura: 2 });
     const allInvoices = distinctNumberInvoices + repeatedNumberInvoices;
     const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
 
@@ -41,9 +36,8 @@ describe('csvFilter', () => {
   });
 
   it('filters out all the invoices with both IVA and IGIC', () => {
-    const distinctTaxesInvoices =
-      CsvInvoiceFilter.getInvoiceHeader() + '\n1,02/05/2019,960,800,20,,ACERLaptop,B76430134,';
-    const bothKindOfTaxesInvoices = '\n2,03/08/2019,2400,2000,20,8,MacBook Pro,,78544372A';
+    const distinctTaxesInvoices = CsvInvoiceFilter.getInvoiceHeader() + createInvoiceLine({});
+    const bothKindOfTaxesInvoices = createInvoiceLine({ numFactura: 2, iva: '20', igic: '10' });
     const allInvoices = distinctTaxesInvoices + bothKindOfTaxesInvoices;
     const csvInvoiceFilter = new CsvInvoiceFilter(allInvoices);
 
@@ -52,3 +46,17 @@ describe('csvFilter', () => {
     expect(result).toBe(distinctTaxesInvoices);
   });
 });
+
+function createInvoiceLine({
+  numFactura = 1,
+  fecha = '02/05/2019',
+  bruto = '1200',
+  neto = '1000',
+  iva = '20',
+  igic = '',
+  concepto = 'ACERLaptop',
+  cifCliente = 'B76430134',
+  nifCliente = '',
+}) {
+  return `\n${numFactura},${fecha},${bruto},${neto},${iva},${igic},${concepto},${cifCliente},${nifCliente}`;
+}
