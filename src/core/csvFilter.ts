@@ -1,5 +1,5 @@
 export class CsvInvoiceFilter {
-  private static invoiceHeaderFields = {
+  private invoiceHeaderFields = {
     numFactura: 'Num_factura',
     fecha: 'Fecha',
     bruto: 'Bruto',
@@ -10,7 +10,7 @@ export class CsvInvoiceFilter {
     cifCliente: 'CIF_cliente',
     nifCliente: 'NIF_cliente',
   };
-  private static invoiceHeaderAsArray = [
+  private invoiceHeaderAsArray = [
     this.invoiceHeaderFields.numFactura,
     this.invoiceHeaderFields.fecha,
     this.invoiceHeaderFields.bruto,
@@ -21,7 +21,6 @@ export class CsvInvoiceFilter {
     this.invoiceHeaderFields.cifCliente,
     this.invoiceHeaderFields.nifCliente,
   ];
-
   private csvFile: string;
   private invoices: string[] = [];
 
@@ -37,7 +36,7 @@ export class CsvInvoiceFilter {
     const startLineForInvoices = 1;
     this.invoices = lines.slice(startLineForInvoices);
 
-    if (header !== CsvInvoiceFilter.getInvoiceHeader()) throw new TypeError('Invalid Header');
+    if (header !== this.invoiceHeaderAsArray.join(',')) throw new TypeError('Invalid Header');
 
     return [header]
       .concat(
@@ -51,14 +50,15 @@ export class CsvInvoiceFilter {
       .join('\n');
   }
 
+  private getIndexOfField(field: string) {
+    return this.invoiceHeaderAsArray.indexOf(field);
+  }
+
   private filterRepeatedInvoiceNumber() {
     const invoiceNumbersFrequency = this.getMapOfInvoiceNumbers();
 
     this.invoices = this.invoices.filter((invoice) => {
-      const invoiceNumber =
-        invoice.split(',')[
-          CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.numFactura)
-        ];
+      const invoiceNumber = invoice.split(',')[this.getIndexOfField(this.invoiceHeaderFields.numFactura)];
       const frequency = invoiceNumbersFrequency.get(invoiceNumber);
       return frequency && frequency === 1;
     });
@@ -68,10 +68,7 @@ export class CsvInvoiceFilter {
 
   private getMapOfInvoiceNumbers() {
     const invoiceNumbers = this.invoices.map(
-      (invoice) =>
-        invoice.split(',')[
-          CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.numFactura)
-        ]
+      (invoice) => invoice.split(',')[this.getIndexOfField(this.invoiceHeaderFields.numFactura)]
     );
 
     const invoiceNumbersFrequency = new Map<string, number>();
@@ -86,10 +83,9 @@ export class CsvInvoiceFilter {
 
   private filterInvoicesWithoutJustOneTaxCode() {
     this.invoices = this.invoices.filter((invoice) => {
-      const iva =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.iva)];
-      const igic =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.igic)];
+      const invoiceAsArray = invoice.split(',');
+      const iva = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.iva)];
+      const igic = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.igic)];
       const hasBothTaxCodes = iva !== '' && igic !== '';
       const hasNoTaxCode = iva === '' && igic === '';
       return !hasBothTaxCodes && !hasNoTaxCode;
@@ -100,14 +96,9 @@ export class CsvInvoiceFilter {
 
   private filterInvoicesWithoutJustOneIdentifier() {
     this.invoices = this.invoices.filter((invoice) => {
-      const cifCliente =
-        invoice.split(',')[
-          CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.cifCliente)
-        ];
-      const nifCliente =
-        invoice.split(',')[
-          CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.nifCliente)
-        ];
+      const invoiceAsArray = invoice.split(',');
+      const cifCliente = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.cifCliente)];
+      const nifCliente = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.nifCliente)];
       const hasBothIdentifiers = cifCliente !== '' && nifCliente !== '';
       const hasNoIdentifier = cifCliente === '' && nifCliente === '';
       return !hasBothIdentifiers && !hasNoIdentifier;
@@ -118,12 +109,10 @@ export class CsvInvoiceFilter {
 
   filterInvoicesWithIvaWronglyCalculated() {
     this.invoices = this.invoices.filter((invoice) => {
-      const bruto =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.bruto)];
-      const neto =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.neto)];
-      const iva =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.iva)];
+      const invoiceAsArray = invoice.split(',');
+      const bruto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.bruto)];
+      const neto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.neto)];
+      const iva = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.iva)];
       if (iva === '') return true;
       return Number(bruto) === (Number(neto) * Number(iva)) / 100 + Number(neto);
     });
@@ -133,12 +122,10 @@ export class CsvInvoiceFilter {
 
   filterInvoicesWithIgicWronglyCalculated() {
     this.invoices = this.invoices.filter((invoice) => {
-      const bruto =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.bruto)];
-      const neto =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.neto)];
-      const igic =
-        invoice.split(',')[CsvInvoiceFilter.invoiceHeaderAsArray.indexOf(CsvInvoiceFilter.invoiceHeaderFields.igic)];
+      const invoiceAsArray = invoice.split(',');
+      const bruto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.bruto)];
+      const neto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.neto)];
+      const igic = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.igic)];
       if (igic === '') return true;
       return Number(bruto) === (Number(neto) * Number(igic)) / 100 + Number(neto);
     });
@@ -148,9 +135,5 @@ export class CsvInvoiceFilter {
 
   private getFilteredInvoices() {
     return this.invoices;
-  }
-
-  static getInvoiceHeader() {
-    return this.invoiceHeaderAsArray.join(',');
   }
 }
