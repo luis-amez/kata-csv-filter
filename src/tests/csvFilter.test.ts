@@ -145,6 +145,14 @@ describe('csvFilter', () => {
 
     expect(result).toBe(rightIgicInvoice);
   });
+
+  it('only keeps the header if all the invoices are invalid', () => {
+    const wrongInvoices = createInvoiceHeader() + createInvoiceLine({}) + createInvoiceLine({});
+
+    const result = new CsvInvoiceFilter(wrongInvoices).filterInvoices();
+
+    expect(result).toBe(createInvoiceHeader());
+  });
 });
 
 function createInvoiceHeader() {
