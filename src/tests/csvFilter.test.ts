@@ -7,17 +7,17 @@ describe('csvFilter', () => {
     }).toThrow('Invalid Header');
   });
 
-  it('fails if there is an invoice with not valid gross', () => {
+  it('fails if there is an invoice with not valid "bruto"', () => {
     expect(() => {
-      const wrongGrossInvoice = createInvoiceLine({ bruto: 'hello' });
-      new CsvInvoiceFilter(createInvoiceHeader() + wrongGrossInvoice).filterInvoices();
+      const wrongBrutoInvoice = createInvoiceLine({ bruto: 'hello' });
+      new CsvInvoiceFilter(createInvoiceHeader() + wrongBrutoInvoice).filterInvoices();
     }).toThrow('Invalid Amount');
   });
 
-  it('fails if there is an invoice with not valid net', () => {
+  it('fails if there is an invoice with not valid "neto"', () => {
     expect(() => {
-      const wrongNetInvoice = createInvoiceLine({ neto: 'hello' });
-      new CsvInvoiceFilter(createInvoiceHeader() + wrongNetInvoice).filterInvoices();
+      const wrongNetoInvoice = createInvoiceLine({ neto: 'hello' });
+      new CsvInvoiceFilter(createInvoiceHeader() + wrongNetoInvoice).filterInvoices();
     }).toThrow('Invalid Amount');
   });
 

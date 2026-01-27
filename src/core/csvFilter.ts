@@ -60,8 +60,8 @@ export class CsvInvoiceFilter {
     if (this.header !== this.invoiceHeaderAsArray.join(',')) throw new TypeError('Invalid Header');
   }
 
-  private checkAmountIsValid(gross: string) {
-    if (!/^[0-9]*$/.test(gross)) throw new TypeError('Invalid Amount');
+  private checkAmountIsValid(amount: string) {
+    if (!/^[0-9]*$/.test(amount)) throw new TypeError('Invalid Amount');
   }
 
   private getIndexOfField(field: string) {
