@@ -25,14 +25,14 @@ describe('csvFilter', () => {
     expect(() => {
       const wrongIVAInvoice = createInvoiceLine({ iva: 'hello' });
       new CsvInvoiceFilter(createInvoiceHeader() + wrongIVAInvoice).filterInvoices();
-    }).toThrow('Invalid Tax Code');
+    }).toThrow('Invalid Amount');
   });
 
-  it('fails if there is an invoice with invalid IGIC', () => {
+  it('fails if there is an invoice with not valid IGIC', () => {
     expect(() => {
       const wrongIGICInvoice = createInvoiceLine({ igic: '-5' });
       new CsvInvoiceFilter(createInvoiceHeader() + wrongIGICInvoice).filterInvoices();
-    }).toThrow('Invalid Tax Code');
+    }).toThrow('Invalid Amount');
   });
 
   it('filters nothing if the file only has the right header', () => {

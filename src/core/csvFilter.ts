@@ -10,17 +10,7 @@ export class CsvInvoiceFilter {
     cifCliente: 'CIF_cliente',
     nifCliente: 'NIF_cliente',
   };
-  private invoiceHeaderAsArray = [
-    this.invoiceHeaderFields.numFactura,
-    this.invoiceHeaderFields.fecha,
-    this.invoiceHeaderFields.bruto,
-    this.invoiceHeaderFields.neto,
-    this.invoiceHeaderFields.iva,
-    this.invoiceHeaderFields.igic,
-    this.invoiceHeaderFields.concepto,
-    this.invoiceHeaderFields.cifCliente,
-    this.invoiceHeaderFields.nifCliente,
-  ];
+  private invoiceHeaderAsArray = Array.from(Object.values(this.invoiceHeaderFields));
   private csvFile: string;
   private header: string = '';
   private invoices: string[] = [];
@@ -60,9 +50,9 @@ export class CsvInvoiceFilter {
       const neto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.neto)];
       this.checkAmountIsValid(neto);
       const iva = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.iva)];
-      this.checkTaxCodeIsValid(iva);
+      this.checkAmountIsValid(iva);
       const igic = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.igic)];
-      this.checkTaxCodeIsValid(igic);
+      this.checkAmountIsValid(igic);
     });
   }
 
@@ -72,10 +62,6 @@ export class CsvInvoiceFilter {
 
   private checkAmountIsValid(gross: string) {
     if (!/^[0-9]*$/.test(gross)) throw new TypeError('Invalid Amount');
-  }
-
-  private checkTaxCodeIsValid(taxCode: string) {
-    if (!/^[0-9]*$/.test(taxCode)) throw new TypeError('Invalid Tax Code');
   }
 
   private getIndexOfField(field: string) {
@@ -135,7 +121,7 @@ export class CsvInvoiceFilter {
     return this;
   }
 
-  filterInvoicesWithIvaWronglyCalculated() {
+  private filterInvoicesWithIvaWronglyCalculated() {
     this.invoices = this.invoices.filter((invoice) => {
       const invoiceAsArray = invoice.split(',');
       const bruto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.bruto)];
@@ -148,7 +134,7 @@ export class CsvInvoiceFilter {
     return this;
   }
 
-  filterInvoicesWithIgicWronglyCalculated() {
+  private filterInvoicesWithIgicWronglyCalculated() {
     this.invoices = this.invoices.filter((invoice) => {
       const invoiceAsArray = invoice.split(',');
       const bruto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.bruto)];
