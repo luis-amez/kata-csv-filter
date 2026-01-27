@@ -102,7 +102,7 @@ export class CsvInvoiceFilter {
       const igic = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.igic)];
       const hasBothTaxCodes = iva !== '' && igic !== '';
       const hasNoTaxCode = iva === '' && igic === '';
-      return !hasBothTaxCodes && !hasNoTaxCode;
+      return !(hasBothTaxCodes || hasNoTaxCode);
     });
 
     return this;
@@ -115,7 +115,7 @@ export class CsvInvoiceFilter {
       const nifCliente = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.nifCliente)];
       const hasBothIdentifiers = cifCliente !== '' && nifCliente !== '';
       const hasNoIdentifier = cifCliente === '' && nifCliente === '';
-      return !hasBothIdentifiers && !hasNoIdentifier;
+      return !(hasBothIdentifiers || hasNoIdentifier);
     });
 
     return this;
@@ -128,7 +128,7 @@ export class CsvInvoiceFilter {
       const neto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.neto)];
       const iva = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.iva)];
       if (iva === '') return true;
-      return Number(bruto) === (Number(neto) * Number(iva)) / 100 + Number(neto);
+      return parseFloat(bruto) === this.getBrutoFromNeto(neto, iva);
     });
 
     return this;
@@ -141,10 +141,14 @@ export class CsvInvoiceFilter {
       const neto = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.neto)];
       const igic = invoiceAsArray[this.getIndexOfField(this.invoiceHeaderFields.igic)];
       if (igic === '') return true;
-      return Number(bruto) === (Number(neto) * Number(igic)) / 100 + Number(neto);
+      return parseFloat(bruto) === this.getBrutoFromNeto(neto, igic);
     });
 
     return this;
+  }
+
+  private getBrutoFromNeto(neto: string, tax: string) {
+    return parseFloat(neto) + (parseFloat(neto) * parseFloat(tax)) / 100;
   }
 
   private getFilteredInvoices() {
