@@ -54,6 +54,23 @@ export class InvoiceFilter {
     return new InvoiceFilter(invoiceList);
   }
 
+  filterInvoices() {
+    const invoiceNumbersFrequency = this.getInvoiceNumbersFrequency();
+    const filteredInvoices = this.invoices.filter(
+      (invoice) =>
+        this.isInvoiceNumberUnique(invoice, invoiceNumbersFrequency) &&
+        this.hasJustOneTaxCode(invoice) &&
+        this.hasJustOneIdentifier(invoice) &&
+        this.isIvaCorrect(invoice) &&
+        this.isIgicCorrect(invoice)
+    );
+
+    return <InvoiceList>{
+      header: this.header,
+      invoices: filteredInvoices,
+    };
+  }
+
   private static checkDataIsValid(header: string, invoices: string[]) {
     this.checkHeaderIsValid(header);
     invoices.forEach((invoice) => {
@@ -79,23 +96,6 @@ export class InvoiceFilter {
 
   private static getIndexOfField(field: string) {
     return InvoiceFilter.invoiceHeaderAsArray.indexOf(field);
-  }
-
-  filterInvoices() {
-    const invoiceNumbersFrequency = this.getInvoiceNumbersFrequency();
-    const filteredInvoices = this.invoices.filter(
-      (invoice) =>
-        this.isInvoiceNumberUnique(invoice, invoiceNumbersFrequency) &&
-        this.hasJustOneTaxCode(invoice) &&
-        this.hasJustOneIdentifier(invoice) &&
-        this.isIvaCorrect(invoice) &&
-        this.isIgicCorrect(invoice)
-    );
-
-    return <InvoiceList>{
-      header: this.header,
-      invoices: filteredInvoices,
-    };
   }
 
   private isInvoiceNumberUnique(invoice: string, invoiceNumbersFrequency: Map<string, number>) {
